@@ -1,0 +1,405 @@
+<!doctype html><html lang="it"><head><title>Portale Formazione Ferraris</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;font-family:system-ui,sans-serif;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style></head><body><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: registro di lavoro — riepilogo in alto, schede-elenco per stato, righe compatte espandibili */
+:root{
+  --bg:#f3f5f8; --surface:#ffffff; --surface-2:#e9edf3; --line:#d3dae4;
+  --fg:#18212e; --muted:#566275; --accent:#1f4fa3; --accent-soft:#e2eafa; --on-accent:#ffffff;
+  --ok:#1d7a4c; --ok-soft:#dff2e8; --warn:#9a5b00; --warn-soft:#fbeed6; --crit:#b3261e; --crit-soft:#fbe3e1;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:8px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10151d; --surface:#171e29; --surface-2:#1f2836; --line:#2d3848;
+  --fg:#e6ebf2; --muted:#9aa7ba; --accent:#8fb1f2; --accent-soft:#1d2c48; --on-accent:#0d1626;
+  --ok:#6fcf9a; --ok-soft:#163326; --warn:#f0b866; --warn-soft:#3a2a10; --crit:#f2867d; --crit-soft:#3d1a18;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10151d; --surface:#171e29; --surface-2:#1f2836; --line:#2d3848;
+  --fg:#e6ebf2; --muted:#9aa7ba; --accent:#8fb1f2; --accent-soft:#1d2c48; --on-accent:#0d1626;
+  --ok:#6fcf9a; --ok-soft:#163326; --warn:#f0b866; --warn-soft:#3a2a10; --crit:#f2867d; --crit-soft:#3d1a18;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0}
+h1{font-size:28px;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:4px 0 0;max-width:68ch}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+header.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
+.agent{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex:none}
+.dot.ok{background:var(--ok)} .dot.warn{background:var(--warn)}
+
+.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:2px;text-align:left}
+.stat b{font-family:var(--f-display);font-size:26px;line-height:1.1}
+.stat span{font-size:13px;color:var(--muted)}
+.stat.alert b{color:var(--crit)}
+button.stat:hover{border-color:var(--accent)}
+@media (max-width:560px){.summary{grid-template-columns:1fr}}
+
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{background:none;border:0;border-bottom:3px solid transparent;padding:10px 12px;color:var(--muted);font-weight:600;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent)}
+.tab .n{font-family:var(--f-mono);font-size:12px;background:var(--surface-2);border-radius:10px;padding:1px 7px;margin-left:6px}
+
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tools input[type=search]{flex:1 1 220px;min-width:0}
+.field{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:8px 10px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:7px 12px;font-weight:600;font-size:14px}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.btn.danger{color:var(--crit)}
+.btn.small{padding:4px 9px;font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chipf{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:4px 10px;font-size:13px}
+.chipf[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--fg)}
+
+.hint{font-size:14px;color:var(--muted)}
+.list{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 16px;padding:14px 16px;border-top:1px solid var(--line)}
+.item:first-child{border-top:0}
+.item h3{font-family:var(--f-body);font-weight:700;font-size:16px;line-height:1.3}
+.meta{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px;color:var(--muted);margin-top:3px}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.tag{font-size:12px;border-radius:4px;padding:1px 7px;background:var(--surface-2);color:var(--fg)}
+.tag.p{font-family:var(--f-mono);background:var(--accent-soft)}
+.tag.fin{background:var(--ok-soft);color:var(--ok)}
+.tag.src{border:1px solid var(--line);background:transparent}
+.side{display:flex;flex-direction:column;align-items:flex-end;gap:6px;text-align:right}
+.due{font-family:var(--f-mono);font-size:12px;border-radius:4px;padding:2px 7px;white-space:nowrap}
+.due.crit{background:var(--crit-soft);color:var(--crit)} .due.warn{background:var(--warn-soft);color:var(--warn)}
+.due.ok{background:var(--surface-2);color:var(--muted)} .due.past{color:var(--muted);text-decoration:line-through}
+.state{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.state.approvata{color:var(--ok)} .state.proposta{color:var(--accent)} .state.svolta{color:var(--muted)}
+.actions{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+details{grid-column:1/-1}
+summary{cursor:pointer;font-size:13px;color:var(--accent);font-weight:600;width:max-content}
+.det{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:4px 14px;font-size:14px;margin-top:8px;max-width:80ch}
+.det dt{color:var(--muted)} .det dd{margin:0;overflow-wrap:anywhere;white-space:pre-line}
+.det textarea{width:100%;min-height:60px;resize:vertical}
+a{color:var(--accent)}
+.confirm{display:inline-flex;gap:6px;align-items:center;font-size:13px}
+@media (max-width:560px){.item{grid-template-columns:1fr}.side{align-items:flex-start;text-align:left;flex-direction:row;flex-wrap:wrap}}
+
+.empty{padding:28px 16px;text-align:center;color:var(--muted)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.form label{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--muted);min-width:0}
+.form .wide{grid-column:1/-1}
+.form .row{grid-column:1/-1;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+@media (max-width:560px){.form{grid-template-columns:1fr}}
+.prio{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 12px;font-size:14px;margin-top:10px}
+.prio b{font-family:var(--f-mono)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:6px;font-size:14px;z-index:20}
+.banner{border:1px solid var(--warn);background:var(--warn-soft);color:var(--fg);border-radius:var(--r);padding:10px 14px;font-size:14px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Portale Formazione Ferraris</h1>
+      <p class="sub">Proposte di formazione per i docenti del Liceo Scientifico «Galileo Ferraris» di Torino: il piano d'istituto, l'archivio 2025/26 e le opportunità che l'agente trova ogni mattina sulle piattaforme ufficiali.</p>
+    </div>
+    <div class="agent" id="agent"><span class="dot"></span><span>Stato dell'agente in caricamento…</span></div>
+  </header>
+
+  <p class="hint" id="readonly" hidden>Vista in sola consultazione, aggiornata al 23/10/2026. Le proposte sono inserite, valutate e aggiornate dalla Commissione Formazione.</p>
+  <div class="banner" id="offline" hidden>Il database del portale non è raggiungibile in questa vista. Apri il portale da claude.ai con il tuo account per vedere e modificare le proposte.</div>
+
+  <section class="summary" aria-label="Riepilogo">
+    <button class="stat" id="s-valutare" data-go="valutare"><b class="mono">–</b><span>segnalazioni da valutare</span></button>
+    <button class="stat" id="s-scad" data-go="valutare"><b class="mono">–</b><span>iscrizioni in scadenza entro 14 giorni</span></button>
+    <button class="stat" id="s-piano" data-go="piano"><b class="mono">–</b><span>voci nel piano 2026/27</span></button>
+  </section>
+
+  <nav class="tabs" role="tablist" aria-label="Sezioni">
+    <button class="tab" role="tab" id="t-valutare" data-tab="valutare">Da valutare<span class="n">0</span></button>
+    <button class="tab" role="tab" id="t-piano" data-tab="piano">Piano 2026/27<span class="n">0</span></button>
+    <button class="tab" role="tab" id="t-archivio" data-tab="archivio">Archivio 2025/26<span class="n">0</span></button>
+    
+  </nav>
+
+  <p class="hint" id="tabhint"></p>
+
+  <div class="tools">
+    <input type="search" class="field" id="q" placeholder="Cerca per titolo, ente, area, note…" aria-label="Cerca">
+    <select class="field" id="farea" aria-label="Area"><option value="">Tutte le aree</option></select>
+    <select class="field" id="fprio" aria-label="Priorità RAV">
+      <option value="">Tutte le priorità RAV</option>
+      <option value="P1">P1 · Risultati scolastici</option>
+      <option value="P2">P2 · Prove INVALSI</option>
+      <option value="P3">P3 · Competenze chiave</option>
+      <option value="P4">P4 · Risultati a distanza</option>
+      <option value="P5">P5 · Benessere</option>
+    </select>
+    <select class="field" id="sort" aria-label="Ordina">
+      <option value="scadenza">Ordina per scadenza</option>
+      <option value="recenti">Più recenti</option>
+      <option value="titolo">Titolo A–Z</option>
+      <option value="area">Area</option>
+    </select>
+    <button class="btn" id="b-add">Aggiungi proposta</button>
+    <button class="btn" id="b-csv">Esporta CSV</button>
+  </div>
+  <div class="chips" id="subchips" hidden>
+    <button class="chipf" data-sub="" aria-pressed="true">Tutte</button>
+    <button class="chipf" data-sub="proposta" aria-pressed="false">Proposte</button>
+    <button class="chipf" data-sub="approvata" aria-pressed="false">Approvate</button>
+    <button class="chipf" data-sub="svolta" aria-pressed="false">Svolte</button>
+  </div>
+
+  <section class="panel" id="addpanel" hidden aria-label="Nuova proposta">
+    <h2 style="font-size:18px;margin-bottom:10px">Nuova proposta</h2>
+    <form class="form" id="addform">
+      <label class="wide">Titolo<input class="field" id="a-titolo" required></label>
+      <label>Ente o formatore<input class="field" id="a-ente"></label>
+      <label>Area<input class="field" id="a-area" list="areas"></label>
+      <label>Destinatari<input class="field" id="a-dest"></label>
+      <label>Modalità<input class="field" id="a-mod" placeholder="online, in presenza, mista…"></label>
+      <label>Periodo<input class="field" id="a-per"></label>
+      <label>Ore<input class="field" id="a-ore"></label>
+      <label>Scadenza iscrizione<input class="field" type="date" id="a-scad"></label>
+      <label>Link<input class="field" type="url" id="a-link" placeholder="https://"></label>
+      <label>Inserisci in<select class="field" id="a-stato"><option value="proposta">Piano 2026/27 (proposta)</option><option value="da_valutare">Da valutare</option></select></label>
+      <label>Finanziamento<input class="field" id="a-fin" placeholder="PNRR, PNFD, gratuito…"></label>
+      <label class="wide">Note<textarea class="field" id="a-note" rows="2"></textarea></label>
+      <div class="row"><button type="button" class="btn" id="a-cancel">Annulla</button><button type="submit" class="btn primary">Salva proposta</button></div>
+    </form>
+    <datalist id="areas"></datalist>
+  </section>
+
+  <section class="list" id="list" aria-live="polite">
+    <div class="empty">Caricamento delle proposte…</div>
+  </section>
+
+  <section class="panel">
+    <details>
+      <summary>Priorità del RAV 2025–28 usate per i collegamenti</summary>
+      <div class="prio">
+        <b>P1</b><span>Risultati scolastici: mantenere ottimi livelli, ridurre l'insuccesso con prevenzione, recupero e supporto personalizzato.</span>
+        <b>P2</b><span>Prove standardizzate: risultati INVALSI sopra la media, meno variabilità tra classi, più effetto scuola nel biennio.</span>
+        <b>P3</b><span>Competenze chiave europee: competenze digitali e di cittadinanza attiva, educazione civica, pensiero critico.</span>
+        <b>P4</b><span>Risultati a distanza: successo all'università, orientamento.</span>
+        <b>P5</b><span>Benessere a scuola: clima, competenze socio-emotive, inclusione, prevenzione del disagio (l'obiettivo di processo prevede formazione specifica dei docenti).</span>
+      </div>
+      <p class="hint" style="margin-top:10px">I collegamenti alle priorità sono una proposta di lavoro: verificali in Commissione prima di riportarli nel piano.</p>
+    </details>
+  </section>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>window.__DATI_PORTALE__={"proposte": [{"aggiornatoIl": "2026-10-22", "aggiuntoIl": "2026-10-22", "area": "Scienze – Matematica", "destinatari": "Docenti di secondaria di I e II grado", "ente": "Accademia delle Scienze di Torino", "finanziamento": "", "fonte": "Newsistruzione, 21/07/2026 (fonte secondaria). Scadenze e codici SOFIA annunciati per i prossimi mesi.", "link": "https://www.newsistruzione.it/2026/07/21/formazione-docenti-2026-27-corsi-scientifici", "modalita": "", "note": "Nessun titolo, data o link ufficiale nella fonte: controllare il sito dell'Accademia e SOFIA.", "ore": "", "origine": "agente", "periodo": "a.s. 2026/27", "pertinenza": "Continuità con le conferenze dell'Accademia già presenti nel piano 25/26 del dipartimento di Scienze e Matematica.", "piattaforma": "SOFIA (codici non ancora pubblicati)", "priorita": ["P1", "P4"], "scadenza": "", "stato": "proposta", "titolo": "Aggiornamento in biologia, chimica e fisica – Accademia delle Scienze di Torino", "verificatoIl": "2026-10-22", "id": "ag-accademia-scienze-2627"}, {"aggiornatoIl": "2026-10-22", "aggiuntoIl": "2026-10-22", "area": "Internazionalizzazione", "destinatari": "La scuola presenta la candidatura per i propri docenti", "ente": "Agenzia nazionale Erasmus+ INDIRE", "finanziamento": "Erasmus+", "fonte": "Pagina Scadenze di erasmusplus.it (contiene solo il bando 2026)", "link": "https://www.erasmusplus.it/programma/scadenze/", "modalita": "Mobilità all'estero", "note": "Nel bando 2026 la scadenza KA121/KA122 era il 19 febbraio, ore 12.00. Le date del bando 2027 non sono ancora pubblicate: va deciso per tempo se candidare la scuola.", "ore": "", "origine": "agente", "periodo": "", "pertinenza": "Finanzia formazione all'estero (lingue, CLIL, metodologie): si collega al CLIL del piano 25/26 e alle certificazioni linguistiche.", "piattaforma": "Erasmus+", "priorita": ["P3", "P4"], "scadenza": "", "stato": "proposta", "titolo": "Erasmus+ KA122 / KA121 – mobilità del personale per corsi e job shadowing all'estero (bando 2027)", "verificatoIl": "2026-10-22", "id": "ag-erasmus-ka122-2027"}, {"aggiornatoIl": "2026-10-22", "aggiuntoIl": "2026-10-22", "area": "Valutazione", "destinatari": "Insegnanti, studenti-insegnanti e dirigenti (primaria e secondaria)", "ente": "Commissione europea – European School Education Platform", "finanziamento": "", "fonte": "Pagina del corso su ESEP", "link": "https://school-education.ec.europa.eu/en/learn/courses/unlocking-power-teachers-digital-competence-assessment-methods-digital-age", "modalita": "Online", "note": "Date, lingua e costo non indicati nella pagina: verificare prima di proporlo.", "ore": "15–20", "origine": "agente", "periodo": "", "pertinenza": "Si collega alla valutazione formativa (piano 25/26) e alle griglie di valutazione comuni previste dagli obiettivi di processo del RAV.", "piattaforma": "ESEP", "priorita": ["P1", "P3"], "scadenza": "", "stato": "proposta", "titolo": "Unlocking the power of teachers' digital competence: Assessment methods in the digital age", "verificatoIl": "2026-10-22", "id": "ag-esep-assessment-digital"}, {"aggiornatoIl": "2026-10-22", "aggiuntoIl": "2026-10-22", "area": "Metodologie didattiche – IA", "destinatari": "Insegnanti, dirigenti e formatori (primaria e secondaria)", "ente": "Commissione europea – European School Education Platform", "finanziamento": "", "fonte": "Pagina del corso su ESEP", "link": "https://school-education.ec.europa.eu/en/learn/courses/creative-classrooms-ai-innovate-responsibly", "modalita": "Online, a ritmo libero, in inglese", "note": "Edizione guidata svolta dal 16/03 al 01/04/2026; ora disponibile senza scadenze. Costo non indicato.", "ore": "5–10", "origine": "agente", "periodo": "Disponibile in autoapprendimento", "pertinenza": "Prosegue il tema «L'IA nella didattica» del piano 25/26 e il Piano IA d'istituto; breve e fruibile in autonomia. Richiede inglese.", "piattaforma": "ESEP", "priorita": ["P3"], "scadenza": "", "stato": "proposta", "titolo": "Creative classrooms with AI: Innovate responsibly", "verificatoIl": "2026-10-22", "id": "ag-esep-creative-ai"}, {"aggiornatoIl": "2026-10-23", "aggiuntoIl": "2026-10-22", "area": "Benessere e competenze personali", "destinatari": "Insegnanti, dirigenti e formatori (primaria e secondaria)", "ente": "Commissione europea – European School Education Platform", "finanziamento": "", "fonte": "Pagina del corso su ESEP", "link": "https://school-education.ec.europa.eu/en/learn/courses/fostering-lifecomp-competencies-through-education-re-run", "modalita": "Online, a ritmo libero, in inglese, 3 moduli", "note": "Sessione guidata svolta dal 9 al 25/02/2026. Costo non indicato.", "ore": "5–10", "origine": "agente", "periodo": "Disponibile in autoapprendimento", "pertinenza": "LifeComp riguarda competenze personali e sociali (gestione delle emozioni, collaborazione), che il RAV indica nel traguardo delle competenze chiave e del benessere.", "piattaforma": "ESEP", "priorita": ["P5", "P3"], "scadenza": "", "stato": "da_valutare", "titolo": "Fostering LifeComp Competencies through Education (riedizione)", "verificatoIl": "2026-10-22", "id": "ag-esep-lifecomp"}, {"aggiornatoIl": "2026-10-22", "aggiuntoIl": "2026-10-22", "area": "Benessere e inclusione", "destinatari": "Docenti di scuola secondaria di I e II grado", "ente": "INDIRE, su incarico del MIM", "finanziamento": "Gratuito", "fonte": "Tecnica della Scuola, articolo del 30/09/2026 (la pagina INDIRE non è leggibile in automatico: controllare date di iscrizione sul sito di registrazione)", "link": "https://dipendenze.indire.it/registrazione/", "modalita": "Online, flessibile (videolezioni, casi, forum, webinar, supervisione a distanza)", "note": "Date di iscrizione e fruizione non indicate nella fonte.", "ore": "50", "origine": "agente", "periodo": "Avviato il 30/09/2026", "pertinenza": "Risponde alla priorità RAV sul benessere e all'obiettivo di processo che prevede formazione specifica dei docenti su disagio e fragilità. Sei moduli tematici, attestato finale.", "piattaforma": "INDIRE", "priorita": ["P5"], "scadenza": "", "stato": "proposta", "titolo": "Prevenzione delle dipendenze e del disagio giovanile", "verificatoIl": "2026-10-22", "id": "ag-indire-dipendenze-2026"}, {"aggiornatoIl": "2026-10-23", "aggiuntoIl": "2026-10-22", "area": "Competenze digitali", "destinatari": "Docenti e dirigenti di ogni ordine e grado", "ente": "MIM – Scuola Futura (segnalato dalle Équipe Formative Territoriali del Piemonte)", "finanziamento": "", "fonte": "Sito EFT Piemonte 2026/27 (sites.google.com/istruzionepiemonte.it/eft)", "link": "https://scuolafutura.pubblica.istruzione.it/a-scuola-con-il-quadro-europeo-digcomp-3.0", "modalita": "MOOC online", "note": "Durata, date e scadenza non indicate nella pagina EFT: verificarle sulla scheda Scuola Futura (accesso con SPID/CIE).", "ore": "", "origine": "agente", "periodo": "", "pertinenza": "Collegato alla priorità RAV sulle competenze digitali e al Piano IA dell'istituto; utile come base comune prima dei corsi PNRR su Python, Arduino e realtà virtuale.", "piattaforma": "Scuola Futura · EFT Piemonte", "priorita": ["P3"], "scadenza": "", "stato": "approvata", "titolo": "A scuola con il quadro europeo DigComp 3.0 (MOOC)", "verificatoIl": "2026-10-22", "id": "ag-scuolafutura-digcomp3"}, {"aggiornatoIl": "2026-10-22", "aggiuntoIl": "2026-10-22", "area": "Inclusione", "destinatari": "Tutto il personale docente (ATA nei moduli 4 e 5)", "ente": "USR Piemonte", "finanziamento": "", "fonte": "Newsistruzione, 30/09/2026. Nota ufficiale USR Piemonte non ancora trovata.", "link": "https://www.newsistruzione.it/2026/09/30/inclusione-scolastica-percorso-formativo-piemonte-2026-2027-pai", "modalita": "5 moduli", "note": "Scadenza incerta: la fonte indica il 20 ottobre 2026 tramite Google Form ma altrove parla di iscrizioni aperte fino a fine ottobre. Ordine di scuola non specificato. Verificare subito sul sito USR Piemonte o con il referente inclusione.", "ore": "30", "origine": "agente", "periodo": "fine ottobre 2026 – maggio 2027", "pertinenza": "Coerente con la macro-area Inclusione del piano 25/26 (DSA, plusdotazione, alunni stranieri) e con la priorità RAV sul benessere e l'inclusione.", "piattaforma": "USR Piemonte (fonte secondaria)", "priorita": ["P5", "P1"], "scadenza": "", "stato": "proposta", "titolo": "Formazione sulla qualità inclusiva – percorso di 30 ore", "verificatoIl": "2026-10-22", "id": "ag-usr-qualita-inclusiva-2627"}, {"aggiuntoIl": "2026-10-22", "area": "Lingue", "destinatari": "Docenti accompagnatori degli stage linguistici", "ente": "Scuola di lingua ospitante", "finanziamento": "", "fonte": "Resoconto dello stage linguistico di Dublino (19/9–2/10/2026), allegato al verbale Dip. Lingue del 5/10/2026, punto 7", "link": "", "modalita": "In presenza, all'estero, durante lo stage", "note": "Da reinserire nel programma dei prossimi stage in fase di contratto con la scuola ospitante. Il Dipartimento chiede di essere coinvolto nella definizione dello stage delle classi terze.", "ore": "", "origine": "manuale", "periodo": "Stage linguistici 2026/27", "pertinenza": "Nel resoconto si segnala che il corso è mancato a Dublino ed è «una delle poche forme di aggiornamento linguistico disponibili», molto apprezzato in passato.", "piattaforma": "", "priorita": ["P4"], "scadenza": "", "stato": "proposta", "titolo": "Corso di lingua per i docenti accompagnatori durante lo stage linguistico", "verificatoIl": "2026-10-22", "id": "dip-lingue-corso-accompagnatori-stage"}, {"aggiuntoIl": "2026-10-22", "area": "Lingue", "destinatari": "Docenti di lingue", "ente": "Liceo Cavour (Torino)", "finanziamento": "", "fonte": "Verbale Dipartimento di Lingue Straniere, 5/10/2026, punto 4", "link": "", "modalita": "In presenza", "note": "Date già trascorse: verificare chi ha partecipato e, in caso, segnare come svolta.", "ore": "", "origine": "manuale", "periodo": "14 e 15 ottobre 2026", "pertinenza": "Collegato all'attività di debate del Dipartimento (tornei internazionali in valutazione) e alle competenze di cittadinanza e pensiero critico del RAV.", "piattaforma": "", "priorita": ["P3"], "scadenza": "", "stato": "proposta", "titolo": "Corso di aggiornamento sulla didattica del debate", "verificatoIl": "2026-10-22", "id": "dip-lingue-debate-2026"}, {"aggiuntoIl": "2026-10-22", "area": "Lingue", "destinatari": "Docenti di lingue", "ente": "Da definire (formatore interno o esterno)", "finanziamento": "", "fonte": "Verbale Dipartimento di Lingue Straniere, 5/10/2026, punto 4", "link": "", "modalita": "In presenza, interno", "note": "Da organizzare a cura dell'Istituto. Il Dipartimento chiede anche di mantenere la precedenza di tre classi nell'accesso al laboratorio.", "ore": "", "origine": "manuale", "periodo": "a.s. 2026/27", "pertinenza": "Richiesto dal Dipartimento per un uso più efficace delle strumentazioni disponibili; coerente con l'obiettivo di processo RAV sugli ambienti di apprendimento digitali.", "piattaforma": "", "priorita": ["P3"], "scadenza": "", "stato": "proposta", "titolo": "Corso di aggiornamento sull'utilizzo del laboratorio linguistico", "verificatoIl": "2026-10-22", "id": "dip-lingue-laboratorio-linguistico"}, {"aggiuntoIl": "2026-10-22", "area": "Inclusione", "destinatari": "Tutti i docenti interessati", "ente": "", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Macrotemi», riga 3", "link": "", "modalita": "", "note": "Riferimento: referente inclusione", "ore": "", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P1", "P5"], "scadenza": "", "stato": "archivio", "titolo": "DSA – valutazione e strategie di insegnamento", "verificatoIl": "", "id": "p2526-m03"}, {"aggiuntoIl": "2026-10-22", "area": "Inclusione", "destinatari": "Tutti i docenti interessati", "ente": "Rete plusdotazione", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Macrotemi», riga 4", "link": "", "modalita": "", "note": "Dobrilla e non solo (credo)", "ore": "", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P1", "P5"], "scadenza": "", "stato": "archivio", "titolo": "Studenti plusdotati", "verificatoIl": "", "id": "p2526-m04"}, {"aggiuntoIl": "2026-10-22", "area": "Inclusione", "destinatari": "Tutti i docenti interessati", "ente": "", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Macrotemi», riga 5", "link": "", "modalita": "", "note": "", "ore": "", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P5"], "scadenza": "", "stato": "archivio", "titolo": "Alunni stranieri", "verificatoIl": "", "id": "p2526-m05"}, {"aggiuntoIl": "2026-10-22", "area": "Inclusione", "destinatari": "Tutti i docenti interessati", "ente": "", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Macrotemi», riga 6", "link": "", "modalita": "", "note": "Pubblicato «Questionario Dietro il Banco» (novembre 2025). Incontro sulla «fragilità emotiva in età adolescenziale», 25 marzo 2026, 2 ore, Dott.ssa Circhirillo.", "ore": "", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P5"], "scadenza": "", "stato": "archivio", "titolo": "Gestione delle emozioni degli studenti", "verificatoIl": "", "id": "p2526-m06"}, {"aggiuntoIl": "2026-10-22", "area": "Inclusione", "destinatari": "Tutto il personale", "ente": "", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Macrotemi», riga 7", "link": "", "modalita": "Autoformazione sulla Piattaforma ELISA", "note": "Dott. Di Lella, 22 e 29 gennaio 2026, 4 ore", "ore": "", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P5", "P3"], "scadenza": "", "stato": "archivio", "titolo": "Bullismo e cyberbullismo", "verificatoIl": "", "id": "p2526-m07"}, {"aggiuntoIl": "2026-10-22", "area": "Metodologie didattiche", "destinatari": "Docenti interessati", "ente": "Scuola polo «Caselette» – Cochis", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Macrotemi», riga 8", "link": "", "modalita": "", "note": "", "ore": "", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P3", "P1"], "scadenza": "", "stato": "archivio", "titolo": "L'IA nella didattica", "verificatoIl": "", "id": "p2526-m08"}, {"aggiuntoIl": "2026-10-22", "area": "Metodologie didattiche", "destinatari": "Docenti interessati", "ente": "Scuola polo «Caselette» e PP&S", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Macrotemi», riga 9", "link": "", "modalita": "", "note": "PP&S: 4, 9 e 17 febbraio 2026", "ore": "", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P1", "P2"], "scadenza": "", "stato": "archivio", "titolo": "La valutazione formativa", "verificatoIl": "", "id": "p2526-m09"}, {"aggiuntoIl": "2026-10-22", "area": "Il Liceo Matematico", "destinatari": "Docenti interessati", "ente": "UniTO, Rete Licei Matematici", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Macrotemi», riga 10", "link": "", "modalita": "", "note": "OK", "ore": "da definire", "origine": "piano2526", "periodo": "dicembre 2025 – maggio 2026", "pertinenza": "", "priorita": ["P1", "P4"], "scadenza": "", "stato": "archivio", "titolo": "Corsi proposti dalla Rete dei Licei Matematici", "verificatoIl": "", "id": "p2526-m10"}, {"aggiuntoIl": "2026-10-22", "area": "Benessere personale", "destinatari": "Docenti interessati", "ente": "Formatori esterni", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Macrotemi», riga 11", "link": "", "modalita": "", "note": "Centro Ulisse? Incontri sulla gestione della classe: 11 febbraio e 11 marzo, 4 ore, Dott.ssa Circhirillo.", "ore": "6", "origine": "piano2526", "periodo": "gennaio – marzo 2026", "pertinenza": "", "priorita": ["P5"], "scadenza": "", "stato": "archivio", "titolo": "Comunicazione assertiva, gestione dei conflitti", "verificatoIl": "", "id": "p2526-m11"}, {"aggiuntoIl": "2026-10-22", "area": "Benessere personale", "destinatari": "Il personale interessato", "ente": "Formatori interni/esterni", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Macrotemi», riga 12", "link": "", "modalita": "", "note": "", "ore": "25", "origine": "piano2526", "periodo": "novembre 2025 – maggio 2025 (così nel file)", "pertinenza": "", "priorita": [], "scadenza": "", "stato": "archivio", "titolo": "Corso di Pilates", "verificatoIl": "", "id": "p2526-m12"}, {"aggiuntoIl": "2026-10-22", "area": "Benessere personale", "destinatari": "Il personale interessato", "ente": "Formatori interni/esterni", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Macrotemi», riga 13", "link": "", "modalita": "", "note": "NON SI ATTUERÀ", "ore": "25", "origine": "piano2526", "periodo": "novembre 2025 – maggio 2026", "pertinenza": "", "priorita": [], "scadenza": "", "stato": "archivio", "titolo": "Progetto Palestra aperta", "verificatoIl": "", "id": "p2526-m13"}, {"aggiuntoIl": "2026-10-22", "area": "Privacy", "destinatari": "Tutto il personale", "ente": "", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Macrotemi», riga 14", "link": "", "modalita": "Formatore esterno / Autoformazione", "note": "Contattare Ghiglia", "ore": "", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": [], "scadenza": "", "stato": "archivio", "titolo": "Corsi del Consulente Karon e del Garante privacy", "verificatoIl": "", "id": "p2526-m14"}, {"aggiuntoIl": "2026-10-22", "area": "Salute e sicurezza nei luoghi di lavoro", "destinatari": "Tutto il personale", "ente": "Formatori interni/esterni", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Macrotemi», riga 15", "link": "", "modalita": "", "note": "LearnIN di Spaggiari", "ore": "", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": [], "scadenza": "", "stato": "archivio", "titolo": "Salute e sicurezza: formazione generale, specifica, preposto, aggiornamento periodico", "verificatoIl": "", "id": "p2526-m15"}, {"aggiuntoIl": "2026-10-22", "area": "Scienze – Matematica", "destinatari": "Docenti", "ente": "Docenti interni", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 3", "link": "", "modalita": "", "note": "", "ore": "2", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P1", "P2"], "scadenza": "", "stato": "archivio", "titolo": "Lesson Study (Andriano)", "verificatoIl": "", "id": "p2526-n01"}, {"aggiuntoIl": "2026-10-22", "area": "Scienze – Matematica", "destinatari": "Docenti", "ente": "Docenti interni e/o esterni", "finanziamento": "PNFD/PNRR", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 4", "link": "", "modalita": "", "note": "", "ore": "10", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P3", "P1"], "scadenza": "", "stato": "archivio", "titolo": "Modellizzazione numerica dei fenomeni fisici/biologici attraverso la programmazione", "verificatoIl": "", "id": "p2526-n02"}, {"aggiuntoIl": "2026-10-22", "area": "Scienze – Matematica", "destinatari": "Docenti", "ente": "Accademia delle Scienze", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 5", "link": "", "modalita": "", "note": "", "ore": "", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P4"], "scadenza": "", "stato": "archivio", "titolo": "Conferenze online dell'Accademia delle Scienze di Torino", "verificatoIl": "", "id": "p2526-n03"}, {"aggiuntoIl": "2026-10-22", "area": "Scienze – Matematica", "destinatari": "Docenti", "ente": "PLS", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 6", "link": "", "modalita": "", "note": "", "ore": "", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P1", "P4"], "scadenza": "", "stato": "archivio", "titolo": "Didattica della chimica", "verificatoIl": "", "id": "p2526-n04"}, {"aggiuntoIl": "2026-10-22", "area": "Scienze – Matematica", "destinatari": "Docenti", "ente": "CAI", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 7", "link": "", "modalita": "", "note": "", "ore": "", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": [], "scadenza": "", "stato": "archivio", "titolo": "Corsi del CAI", "verificatoIl": "", "id": "p2526-n05"}, {"aggiuntoIl": "2026-10-22", "area": "Lingue", "destinatari": "Docenti di inglese", "ente": "IATEFL", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 8", "link": "", "modalita": "", "note": "", "ore": "", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P4"], "scadenza": "", "stato": "archivio", "titolo": "Certificazioni lingue", "verificatoIl": "", "id": "p2526-n06"}, {"aggiuntoIl": "2026-10-22", "area": "Storia e filosofia", "destinatari": "Allievi e docenti", "ente": "Docenti interni", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 9", "link": "", "modalita": "", "note": "", "ore": "", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P3"], "scadenza": "", "stato": "archivio", "titolo": "Seminari di presentazione libri di argomento storico o filosofico", "verificatoIl": "", "id": "p2526-n07"}, {"aggiuntoIl": "2026-10-22", "area": "Storia e filosofia", "destinatari": "Genitori e docenti", "ente": "", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 10", "link": "", "modalita": "", "note": "", "ore": "", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P5"], "scadenza": "", "stato": "archivio", "titolo": "Gruppi di narrazione", "verificatoIl": "", "id": "p2526-n08"}, {"aggiuntoIl": "2026-10-22", "area": "Storia e filosofia", "destinatari": "Allievi e docenti", "ente": "Docenti interni e/o esterni", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 11", "link": "", "modalita": "", "note": "", "ore": "", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P3"], "scadenza": "", "stato": "archivio", "titolo": "Ciclo di incontri su temi di storia degli ultimi 50 anni", "verificatoIl": "", "id": "p2526-n09"}, {"aggiuntoIl": "2026-10-22", "area": "Lettere", "destinatari": "Docenti triennio", "ente": "Docenti interni", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 12", "link": "", "modalita": "", "note": "", "ore": "", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P1"], "scadenza": "", "stato": "archivio", "titolo": "Autoaggiornamento sulla valutazione", "verificatoIl": "", "id": "p2526-n10"}, {"aggiuntoIl": "2026-10-22", "area": "Lettere", "destinatari": "Docenti", "ente": "Docenti interni", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 13", "link": "", "modalita": "", "note": "", "ore": "6", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": [], "scadenza": "", "stato": "archivio", "titolo": "Autoaggiornamento sulla letteratura contemporanea", "verificatoIl": "", "id": "p2526-n11"}, {"aggiuntoIl": "2026-10-22", "area": "Lettere", "destinatari": "", "ente": "Istituto Storico della Resistenza", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 14", "link": "", "modalita": "", "note": "", "ore": "", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P3"], "scadenza": "", "stato": "archivio", "titolo": "Storia della Resistenza", "verificatoIl": "", "id": "p2526-n12"}, {"aggiuntoIl": "2026-10-22", "area": "Disegno e storia dell'arte", "destinatari": "Docenti", "ente": "Palazzo Madama", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 15", "link": "", "modalita": "", "note": "", "ore": "", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": [], "scadenza": "", "stato": "archivio", "titolo": "Ciclo di lezioni sul Rinascimento in Europa", "verificatoIl": "", "id": "p2526-n13"}, {"aggiuntoIl": "2026-10-22", "area": "Disegno e storia dell'arte", "destinatari": "Docenti", "ente": "Dipartimento DISMA – Politecnico di Torino", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 16", "link": "", "modalita": "", "note": "", "ore": "", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P1"], "scadenza": "", "stato": "archivio", "titolo": "Lezioni di geometria", "verificatoIl": "", "id": "p2526-n14"}, {"aggiuntoIl": "2026-10-22", "area": "Metodologie didattiche", "destinatari": "Tutti i docenti", "ente": "Esperti esterni/interni", "finanziamento": "PNRR", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 17", "link": "", "modalita": "", "note": "", "ore": "18", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P3", "P4"], "scadenza": "", "stato": "archivio", "titolo": "CLIL", "verificatoIl": "", "id": "p2526-n15"}, {"aggiuntoIl": "2026-10-22", "area": "Metodologie didattiche", "destinatari": "Tutti i docenti", "ente": "Esperto esterno / Prof. Chiarle", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 18", "link": "", "modalita": "", "note": "Programma annuale", "ore": "", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P4"], "scadenza": "", "stato": "archivio", "titolo": "La didattica orientativa", "verificatoIl": "", "id": "p2526-n16"}, {"aggiuntoIl": "2026-10-22", "area": "Metodologie per la Scuola 4.0", "destinatari": "Tutto il personale", "ente": "Esperti interni/esterni", "finanziamento": "PNRR", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 19", "link": "", "modalita": "", "note": "", "ore": "", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P3"], "scadenza": "", "stato": "archivio", "titolo": "Python", "verificatoIl": "", "id": "p2526-n17"}, {"aggiuntoIl": "2026-10-22", "area": "Metodologie per la Scuola 4.0", "destinatari": "Tutti i docenti", "ente": "Esperti interni/esterni", "finanziamento": "PNRR", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 20", "link": "", "modalita": "", "note": "", "ore": "", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P3", "P1"], "scadenza": "", "stato": "archivio", "titolo": "Uso di Arduino/Raspberry Pi", "verificatoIl": "", "id": "p2526-n18"}, {"aggiuntoIl": "2026-10-22", "area": "Metodologie per la Scuola 4.0", "destinatari": "Tutti i docenti", "ente": "Esperti esterni del Politecnico; tutor prof. Frangella e Marchi", "finanziamento": "PNRR", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 21", "link": "", "modalita": "", "note": "Laboratorio per docenti: si progettano attività interattive in cui gli studenti, in ambiente VR con i visori, esplorano proprietà della geometria euclidea nello spazio (rette, piani, solidi, diedri). Le applicazioni sono sviluppate dal Politecnico. Voce senza numero nel file.", "ore": "monte ore da definire", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P1", "P3"], "scadenza": "", "stato": "archivio", "titolo": "Applicazioni di geometria solida in realtà virtuale", "verificatoIl": "", "id": "p2526-n18b"}, {"aggiuntoIl": "2026-10-22", "area": "Metodologie per la Scuola 4.0", "destinatari": "Tutti i docenti", "ente": "Docenti interni", "finanziamento": "PNRR", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 22", "link": "", "modalita": "", "note": "", "ore": "", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P3"], "scadenza": "", "stato": "archivio", "titolo": "Realtà virtuale", "verificatoIl": "", "id": "p2526-n19"}, {"aggiuntoIl": "2026-10-22", "area": "Informatica per tutti", "destinatari": "Tutto il personale", "ente": "Animatore digitale", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 23", "link": "", "modalita": "", "note": "", "ore": "8+8", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P3"], "scadenza": "", "stato": "archivio", "titolo": "Uso del foglio elettronico", "verificatoIl": "", "id": "p2526-n20"}, {"aggiuntoIl": "2026-10-22", "area": "Informatica per tutti", "destinatari": "Tutto il personale", "ente": "Animatore digitale", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 24", "link": "", "modalita": "", "note": "", "ore": "6", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P3"], "scadenza": "", "stato": "archivio", "titolo": "Corso base di informatica", "verificatoIl": "", "id": "p2526-n21"}, {"aggiuntoIl": "2026-10-22", "area": "Informatica per tutti", "destinatari": "Tutto il personale", "ente": "Animatore digitale", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 25", "link": "", "modalita": "", "note": "", "ore": "3+3+3", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P3"], "scadenza": "", "stato": "archivio", "titolo": "Elementi di base per Google Workspace", "verificatoIl": "", "id": "p2526-n22"}, {"aggiuntoIl": "2026-10-22", "area": "Normativa scolastica", "destinatari": "Tutto il personale", "ente": "Karon – consulente privacy dell'istituto", "finanziamento": "Gratuito", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 26", "link": "", "modalita": "", "note": "", "ore": "", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": [], "scadenza": "", "stato": "archivio", "titolo": "La responsabilità del personale scolastico", "verificatoIl": "", "id": "p2526-n23"}, {"aggiuntoIl": "2026-10-22", "area": "Normativa scolastica", "destinatari": "Tutto il personale", "ente": "Karon – consulente privacy dell'istituto", "finanziamento": "Gratuito", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 27", "link": "", "modalita": "", "note": "", "ore": "", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": [], "scadenza": "", "stato": "archivio", "titolo": "Privacy", "verificatoIl": "", "id": "p2526-n24"}, {"aggiuntoIl": "2026-10-22", "area": "Matematica e fisica", "destinatari": "Dipartimento di matematica/fisica", "ente": "Selvaduray/Riccardi", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 29", "link": "", "modalita": "", "note": "", "ore": "", "origine": "piano2526", "periodo": "", "pertinenza": "", "priorita": ["P4", "P3"], "scadenza": "", "stato": "archivio", "titolo": "QTRIS – Quantum computing", "verificatoIl": "", "id": "p2526-n26"}, {"aggiuntoIl": "2026-10-22", "area": "Intelligenza artificiale", "destinatari": "Tutti i docenti", "ente": "Referente IA / GLIA; eventuali esperti esterni", "finanziamento": "", "fonte": "Piano d'Istituto per l'Intelligenza Artificiale, Allegato 5.2 (Torino, 1/9/2026), sez. 15 e 16", "link": "", "modalita": "Anche asincrona: materiali testuali, multimediali, webinar", "note": "Il Piano IA non è ancora formalmente approvato (delibere non compilate): la Commissione lo usa comunque come riferimento per la programmazione 2026/27. Possibile raccordo con le offerte esterne già segnalate: MOOC DigComp 3.0, corsi ESEP sull'IA, corso «L'IA nella didattica» della scuola polo Caselette.", "ore": "", "origine": "manuale", "periodo": "a.s. 2026/27", "pertinenza": "Il Piano IA la indica come priorità formativa dell'anno e come condizione per ogni fase successiva (uso dell'IA con gli studenti). Le tre dimensioni: funzionamento di base, profili giuridici ed etici, inserimento nel quadro didattico del PTOF.", "piattaforma": "", "priorita": ["P3"], "scadenza": "", "stato": "proposta", "titolo": "AI literacy per i docenti: funzionamento dei sistemi di IA, rischi, scelte precauzionali dell'istituto, integrazione nella progettazione e in aula", "verificatoIl": "2026-10-22", "id": "piano-ia-ai-literacy-docenti"}, {"aggiuntoIl": "2026-10-22", "area": "Intelligenza artificiale", "destinatari": "Personale ATA", "ente": "Referente IA / GLIA; DPO", "finanziamento": "", "fonte": "Piano d'Istituto per l'IA, Allegato 5.2, sez. 16", "link": "", "modalita": "", "note": "Non rivolto ai docenti: inserito per completezza del piano d'istituto.", "ore": "", "origine": "manuale", "periodo": "a.s. 2026/27", "pertinenza": "Previsto esplicitamente dal Piano IA per il personale ATA.", "piattaforma": "", "priorita": [], "scadenza": "", "stato": "proposta", "titolo": "IA a supporto dei processi di segreteria: gestione sicura dei dati, rapporti con i fornitori, ricadute organizzative", "verificatoIl": "2026-10-22", "id": "piano-ia-formazione-ata"}, {"aggiuntoIl": "2026-10-22", "area": "Intelligenza artificiale", "destinatari": "Docenti e personale ATA; in particolare Referente IA e GLIA", "ente": "DPO / consulente esterno", "finanziamento": "", "fonte": "Piano d'Istituto per l'IA, Allegato 5.2, sez. 14 e 15", "link": "", "modalita": "", "note": "Si collega ai corsi Privacy del consulente Karon già nel piano 2025/26: valutare un modulo unico.", "ore": "", "origine": "manuale", "periodo": "a.s. 2026/27", "pertinenza": "Il Piano prevede formazione mirata ai referenti interni da parte del DPO o del consulente esterno e la conoscenza dei profili giuridici come dimensione dell'AI literacy.", "piattaforma": "", "priorita": ["P3"], "scadenza": "", "stato": "proposta", "titolo": "Profili giuridici ed etici dell'IA: AI Act, GDPR, trasparenza, tutela dei minori", "verificatoIl": "2026-10-22", "id": "piano-ia-profili-giuridici-etici"}, {"aggiuntoIl": "2026-10-22", "area": "Intelligenza artificiale", "destinatari": "Personale e studenti", "ente": "Università, enti di ricerca, associazioni, professionisti", "finanziamento": "", "fonte": "Piano d'Istituto per l'IA, Allegato 5.2, sez. 16", "link": "", "modalita": "", "note": "Possibili interlocutori già presenti nel piano 25/26: Politecnico (DISMA), UniTO, Accademia delle Scienze.", "ore": "", "origine": "manuale", "periodo": "a.s. 2026/27, eventuale", "pertinenza": "Previsto dal Piano IA in funzione dei bisogni formativi emersi e delle opportunità del territorio.", "piattaforma": "", "priorita": ["P3"], "scadenza": "", "stato": "proposta", "titolo": "Seminari, incontri tematici o laboratori dimostrativi sull'IA con soggetti esterni qualificati", "verificatoIl": "2026-10-22", "id": "piano-ia-seminari-esterni"}, {"aggiuntoIl": "2026-10-22", "area": "Intelligenza artificiale", "destinatari": "Docenti", "ente": "Docenti interni / GLIA", "finanziamento": "", "fonte": "Piano d'Istituto per l'IA, Allegato 5.2, sez. 11 e 16", "link": "", "modalita": "Laboratorio di progettazione", "note": "Da attivare solo dopo il consolidamento della competenza interna (Piano IA, sez. 16).", "ore": "", "origine": "manuale", "periodo": "Fase successiva, dopo la formazione dei docenti", "pertinenza": "Il Piano IA prevede che l'AI literacy degli studenti sia progettata e condotta dai docenti dentro l'educazione civica digitale, trattando l'IA come oggetto di comprensione critica e non come strumento di uso autonomo.", "piattaforma": "", "priorita": ["P3"], "scadenza": "", "stato": "proposta", "titolo": "Progettazione di UdA interdisciplinari e moduli di educazione civica digitale sull'IA (AI literacy per gli studenti)", "verificatoIl": "2026-10-22", "id": "piano-ia-uda-educazione-civica"}, {"aggiuntoIl": "2026-10-22", "area": "Metodologie didattiche", "destinatari": "Docenti interessati", "ente": "Scuola polo «Caselette» – Cochis", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Macrotemi», riga 8", "link": "", "modalita": "", "note": "Riproposta dal piano 2025/26.", "ore": "", "origine": "manuale", "periodo": "", "pertinenza": "", "priorita": ["P3", "P1"], "scadenza": "", "stato": "proposta", "titolo": "L'IA nella didattica", "verificatoIl": "", "id": "r-p2526-m08"}, {"aggiuntoIl": "2026-10-22", "area": "Scienze – Matematica", "destinatari": "Docenti", "ente": "Docenti interni", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 3", "link": "", "modalita": "", "note": "Riproposta dal piano 2025/26.", "ore": "2", "origine": "manuale", "periodo": "", "pertinenza": "", "priorita": ["P1", "P2"], "scadenza": "", "stato": "proposta", "titolo": "Lesson Study (Andriano)", "verificatoIl": "", "id": "r-p2526-n01"}, {"aggiuntoIl": "2026-10-22", "area": "Scienze – Matematica", "destinatari": "Docenti", "ente": "Docenti interni e/o esterni", "finanziamento": "PNFD/PNRR", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 4", "link": "", "modalita": "", "note": "Riproposta dal piano 2025/26.", "ore": "10", "origine": "manuale", "periodo": "", "pertinenza": "", "priorita": ["P3", "P1"], "scadenza": "", "stato": "proposta", "titolo": "Modellizzazione numerica dei fenomeni fisici/biologici attraverso la programmazione", "verificatoIl": "", "id": "r-p2526-n02"}, {"aggiuntoIl": "2026-10-22", "area": "Scienze – Matematica", "destinatari": "Docenti", "ente": "Accademia delle Scienze", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 5", "link": "", "modalita": "", "note": "Riproposta dal piano 2025/26.", "ore": "", "origine": "manuale", "periodo": "", "pertinenza": "", "priorita": ["P4"], "scadenza": "", "stato": "proposta", "titolo": "Conferenze online dell'Accademia delle Scienze di Torino", "verificatoIl": "", "id": "r-p2526-n03"}, {"aggiuntoIl": "2026-10-22", "area": "Scienze – Matematica", "destinatari": "Docenti", "ente": "PLS", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 6", "link": "", "modalita": "", "note": "Riproposta dal piano 2025/26.", "ore": "", "origine": "manuale", "periodo": "", "pertinenza": "", "priorita": ["P1", "P4"], "scadenza": "", "stato": "proposta", "titolo": "Didattica della chimica", "verificatoIl": "", "id": "r-p2526-n04"}, {"aggiuntoIl": "2026-10-22", "area": "Scienze – Matematica", "destinatari": "Docenti", "ente": "CAI", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 7", "link": "", "modalita": "", "note": "Riproposta dal piano 2025/26.", "ore": "", "origine": "manuale", "periodo": "", "pertinenza": "", "priorita": [], "scadenza": "", "stato": "proposta", "titolo": "Corsi del CAI", "verificatoIl": "", "id": "r-p2526-n05"}, {"aggiuntoIl": "2026-10-22", "area": "Storia e filosofia", "destinatari": "Allievi e docenti", "ente": "Docenti interni", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 9", "link": "", "modalita": "", "note": "Riproposta dal piano 2025/26.", "ore": "", "origine": "manuale", "periodo": "", "pertinenza": "", "priorita": ["P3"], "scadenza": "", "stato": "proposta", "titolo": "Seminari di presentazione libri di argomento storico o filosofico", "verificatoIl": "", "id": "r-p2526-n07"}, {"aggiuntoIl": "2026-10-22", "area": "Storia e filosofia", "destinatari": "Genitori e docenti", "ente": "", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 10", "link": "", "modalita": "", "note": "Riproposta dal piano 2025/26.", "ore": "", "origine": "manuale", "periodo": "", "pertinenza": "", "priorita": ["P5"], "scadenza": "", "stato": "proposta", "titolo": "Gruppi di narrazione", "verificatoIl": "", "id": "r-p2526-n08"}, {"aggiuntoIl": "2026-10-22", "area": "Storia e filosofia", "destinatari": "Allievi e docenti", "ente": "Docenti interni e/o esterni", "finanziamento": "", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 11", "link": "", "modalita": "", "note": "Riproposta dal piano 2025/26.", "ore": "", "origine": "manuale", "periodo": "", "pertinenza": "", "priorita": ["P3"], "scadenza": "", "stato": "proposta", "titolo": "Ciclo di incontri su temi di storia degli ultimi 50 anni", "verificatoIl": "", "id": "r-p2526-n09"}, {"aggiuntoIl": "2026-10-22", "area": "Metodologie per la Scuola 4.0", "destinatari": "Tutti i docenti", "ente": "Esperti esterni del Politecnico; tutor prof. Frangella e Marchi", "finanziamento": "PNRR", "fonte": "Piano di formazione docenti 25/26 – foglio «Piano formazione», riga 21", "link": "", "modalita": "", "note": "Laboratorio per docenti: si progettano attività interattive in cui gli studenti, in ambiente VR con i visori, esplorano proprietà della geometria euclidea nello spazio (rette, piani, solidi, diedri). Le applicazioni sono sviluppate dal Politecnico. Voce senza numero nel file.\nRiproposta dal piano 2025/26.", "ore": "monte ore da definire", "origine": "manuale", "periodo": "", "pertinenza": "", "priorita": ["P1", "P3"], "scadenza": "", "stato": "proposta", "titolo": "Applicazioni di geometria solida in realtà virtuale", "verificatoIl": "", "id": "r-p2526-n18b"}], "meta": {"esito": "prima ricerca", "fonti": ["Scuola Futura", "USR Piemonte", "EFT Piemonte", "INDIRE", "ESEP/eTwinning", "Erasmus+", "UniTO"], "nuove": 8, "ultimaEsecuzione": "2026-10-22T12:00:00+02:00"}};</script>
+<script>
+(function(){
+  const LABEL_STATO={da_valutare:"Da valutare",proposta:"Proposta",approvata:"Approvata",svolta:"Svolta",archivio:"Archivio 25/26",scartata:"Scartata"};
+  const TAB_STATI={valutare:["da_valutare"],piano:["proposta","approvata","svolta"],archivio:["archivio"],scartate:["scartata"]};
+  const HINTS={
+    valutare:"Opportunità trovate dall'agente sulle piattaforme ufficiali, in attesa della valutazione della Commissione.",
+    piano:"Proposte per il piano di formazione 2026/27. Lo stato «Approvata» va usato dopo la delibera del Collegio.",
+    archivio:"Le 39 voci del piano di formazione 2025/26, così come sono nel file Excel. Puoi riproporne una per il 2026/27.",
+    scartate:"Segnalazioni scartate. L'agente non le riproporrà; puoi ripristinarle."
+  };
+  let docs=[], db=null, dl=null, tab="piano", sub="", openConfirm=null, canWrite=false;
+  try{const h=(location.hash||"").slice(1); if(TAB_STATI[h]) tab=h;}catch(e){}
+  try{const t=localStorage.getItem("pff-tab"); if(!location.hash && t && TAB_STATI[t]) tab=t;}catch(e){}
+
+  const $=s=>document.querySelector(s);
+  const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const safeUrl=u=>{try{const x=new URL(u);return (x.protocol==="https:"||x.protocol==="http:")?x.href:"";}catch(e){return "";}};
+  function toast(msg){const t=$("#toast");t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,2600);}
+
+  function today(){const d=new Date();d.setHours(0,0,0,0);return d;}
+  function daysTo(iso){if(!iso||!/^\d{4}-\d{2}-\d{2}$/.test(iso))return null;const [y,m,d]=iso.split("-").map(Number);return Math.round((new Date(y,m-1,d)-today())/86400000);}
+  function fmtDate(iso){if(!iso)return "";const p=iso.split("-");return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:iso;}
+  function dueBadge(iso){const n=daysTo(iso);if(n===null)return "";
+    if(n<0)return `<span class="due past">scaduta ${fmtDate(iso)}</span>`;
+    const cls=n<=7?"crit":n<=14?"warn":"ok";
+    const when=n===0?"oggi":n===1?"domani":`tra ${n} gg`;
+    return `<span class="due ${cls}">scade ${fmtDate(iso)} · ${when}</span>`;}
+
+  function counts(){const c={valutare:0,piano:0,archivio:0,scartate:0};let scad=0;
+    for(const d of docs){for(const k in TAB_STATI){if(TAB_STATI[k].includes(d.stato))c[k]++;}
+      const n=daysTo(d.scadenza); if(n!==null&&n>=0&&n<=14&&(d.stato==="da_valutare"||d.stato==="proposta"||d.stato==="approvata"))scad++;}
+    return {c,scad};}
+
+  function renderSummary(){const {c,scad}=counts();
+    $("#s-valutare b").textContent=c.valutare;
+    $("#s-scad b").textContent=scad; $("#s-scad").classList.toggle("alert",scad>0);
+    $("#s-piano b").textContent=c.piano;
+    for(const k in c){const n=$("#t-"+k+" .n"); if(n)n.textContent=c[k];}
+    const areas=[...new Set(docs.map(d=>d.area).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"it"));
+    const sel=$("#farea"),cur=sel.value;
+    sel.innerHTML='<option value="">Tutte le aree</option>'+areas.map(a=>`<option${a===cur?" selected":""}>${esc(a)}</option>`).join("");
+    $("#areas").innerHTML=areas.map(a=>`<option value="${esc(a)}"></option>`).join("");
+  }
+
+  function filtered(){
+    const q=$("#q").value.trim().toLowerCase(), area=$("#farea").value, pr=$("#fprio").value;
+    let out=docs.filter(d=>TAB_STATI[tab].includes(d.stato));
+    if(tab==="piano"&&sub) out=out.filter(d=>d.stato===sub);
+    if(area) out=out.filter(d=>d.area===area);
+    if(pr) out=out.filter(d=>(d.priorita||[]).includes(pr));
+    if(q) out=out.filter(d=>[d.titolo,d.ente,d.area,d.note,d.destinatari,d.fonte,d.pertinenza,d.noteCommissione].join(" ").toLowerCase().includes(q));
+    const s=$("#sort").value;
+    const big="9999-12-31";
+    out.sort((a,b)=>{
+      if(s==="titolo")return (a.titolo||"").localeCompare(b.titolo||"","it");
+      if(s==="area")return (a.area||"").localeCompare(b.area||"","it")||(a.titolo||"").localeCompare(b.titolo||"","it");
+      if(s==="recenti")return (b.aggiuntoIl||"").localeCompare(a.aggiuntoIl||"");
+      const da=daysTo(a.scadenza),dbb=daysTo(b.scadenza);
+      const ka=(da===null||da<0)?big:a.scadenza, kb=(dbb===null||dbb<0)?big:b.scadenza;
+      return ka.localeCompare(kb)||(a.area||"").localeCompare(b.area||"","it")||(a.titolo||"").localeCompare(b.titolo||"","it");
+    });
+    return out;}
+
+  function actionsFor(d){
+    if(!canWrite) return "";
+    const b=(act,label,cls="")=>`<button class="btn small ${cls}" data-act="${act}" data-id="${esc(d.id)}">${label}</button>`;
+    let h="";
+    if(d.stato==="da_valutare") h=b("to:proposta","Inserisci nel piano","primary")+b("to:scartata","Scarta");
+    else if(d.stato==="proposta") h=b("to:approvata","Segna approvata","primary")+b("to:da_valutare","Rimetti da valutare");
+    else if(d.stato==="approvata") h=b("to:svolta","Segna svolta","primary")+b("to:proposta","Torna a proposta");
+    else if(d.stato==="svolta") h=b("to:approvata","Torna ad approvata");
+    else if(d.stato==="archivio") h=b("riproponi","Riproponi per il 2026/27","primary");
+    else if(d.stato==="scartata") h=b("to:da_valutare","Ripristina");
+    if(d.stato!=="archivio"){
+      h+= openConfirm===d.id
+        ? `<span class="confirm">Eliminare definitivamente? ${b("delete","Elimina","danger")}${b("nodelete","Annulla")}</span>`
+        : b("askdelete","Elimina","danger");
+    }
+    return h;}
+
+  function renderList(){
+    $("#tabhint").textContent=HINTS[tab];
+    $("#subchips").hidden=tab!=="piano";
+    document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",String(t.dataset.tab===tab)));
+    const list=$("#list"); const items=filtered();
+    if(!db){return;}
+    if(!items.length){
+      const msg = tab==="valutare" ? "Nessuna segnalazione da valutare. L'agente inserisce qui le nuove opportunità ogni mattina dei giorni feriali."
+        : tab==="piano" ? "Il piano 2026/27 è vuoto. Inserisci una segnalazione, riproponi una voce dell'archivio o usa «Aggiungi proposta»."
+        : tab==="scartate" ? "Nessuna segnalazione scartata." : "L'archivio 2025/26 è vuoto.";
+      const filt=$("#q").value||$("#farea").value||$("#fprio").value;
+      list.innerHTML=`<div class="empty">${filt?"Nessuna voce corrisponde ai filtri.":msg}</div>`; return;}
+    list.innerHTML=items.map(d=>{
+      const link=safeUrl(d.link);
+      const meta=[d.ente,d.destinatari,d.modalita,d.periodo,d.ore?`${d.ore} ore`:""].filter(Boolean).map(x=>`<span>${esc(x)}</span>`).join("");
+      const tags=[d.area?`<span class="tag">${esc(d.area)}</span>`:"",
+        ...(d.priorita||[]).map(p=>`<span class="tag p" title="Priorità RAV">${esc(p)}</span>`),
+        d.finanziamento?`<span class="tag fin">${esc(d.finanziamento)}</span>`:"",
+        d.piattaforma?`<span class="tag src">${esc(d.piattaforma)}</span>`:""].join("");
+      const rows=[["Fonte",d.fonte],["Perché è pertinente",d.pertinenza],["Note",d.note],
+        ["Verificato il",fmtDate(d.verificatoIl)],["Inserito il",fmtDate(d.aggiuntoIl)],
+        ["Origine",d.origine==="agente"?"Agente di ricerca":d.origine==="piano2526"?"Piano 2025/26":"Inserimento manuale"]]
+        .filter(r=>r[1]).map(r=>`<dt>${r[0]}</dt><dd>${esc(r[1])}</dd>`).join("");
+      return `<article class="item" data-id="${esc(d.id)}">
+        <div style="min-width:0">
+          <h3>${esc(d.titolo)}</h3>
+          <div class="meta">${meta}</div>
+          <div class="tags">${tags}</div>
+        </div>
+        <div class="side">
+          ${tab==="piano"?`<span class="state ${esc(d.stato)}">${LABEL_STATO[d.stato]||""}</span>`:""}
+          ${dueBadge(d.scadenza)}
+          ${link?`<a href="${esc(link)}" target="_blank" rel="noopener">Apri la fonte ↗</a>`:""}
+        </div>
+        <details${openDetails.has(d.id)?" open":""} data-det="${esc(d.id)}">
+          <summary>Dettagli e note della Commissione</summary>
+          <dl class="det">${rows}
+            ${canWrite?`<dt><label for="nc-${esc(d.id)}">Note della Commissione</label></dt>
+            <dd><textarea class="field" id="nc-${esc(d.id)}" data-nc="${esc(d.id)}" placeholder="Decisioni, referente, costi, collegamento al PdM…">${esc(d.noteCommissione||"")}</textarea>
+            <div style="margin-top:6px"><button class="btn small" data-act="savenote" data-id="${esc(d.id)}">Salva nota</button></div></dd>`
+            :(d.noteCommissione?`<dt>Note della Commissione</dt><dd>${esc(d.noteCommissione)}</dd>`:"")}
+          </dl>
+        </details>
+        <div class="actions">${actionsFor(d)}</div>
+      </article>`;}).join("");
+  }
+  const openDetails=new Set();
+
+  function render(){renderSummary();renderList();}
+
+  function setTab(t){tab=t;openConfirm=null;try{localStorage.setItem("pff-tab",t);}catch(e){} render();}
+
+  async function write(id,patch,okMsg){
+    if(!db)return;
+    try{await db.doc("proposte/"+id).update(patch); if(okMsg)toast(okMsg);}
+    catch(e){toast(e&&e.code==="invalid_argument"?"Non hai i permessi per modificare questa voce.":"Salvataggio non riuscito. Riprova tra poco.");}
+  }
+
+  document.addEventListener("click",async ev=>{
+    const tb=ev.target.closest("[data-tab]"); if(tb){setTab(tb.dataset.tab);return;}
+    const go=ev.target.closest("[data-go]"); if(go){setTab(go.dataset.go);return;}
+    const sc=ev.target.closest("[data-sub]"); if(sc){sub=sc.dataset.sub;document.querySelectorAll("[data-sub]").forEach(x=>x.setAttribute("aria-pressed",String(x===sc)));renderList();return;}
+    const a=ev.target.closest("[data-act]"); if(!a||!canWrite)return;
+    const id=a.dataset.id, act=a.dataset.act, d=docs.find(x=>x.id===id); if(!d)return;
+    if(act.startsWith("to:")){const st=act.slice(3);
+      const msg={proposta:"Inserita nel piano 2026/27",scartata:"Segnalazione scartata",approvata:"Segnata come approvata",svolta:"Segnata come svolta",da_valutare:"Rimessa tra le voci da valutare"}[st];
+      await write(id,{stato:st,aggiornatoIl:new Date().toISOString().slice(0,10)},msg);}
+    else if(act==="savenote"){const v=document.querySelector(`[data-nc="${CSS.escape(id)}"]`).value; await write(id,{noteCommissione:v},"Nota salvata");}
+    else if(act==="askdelete"){openConfirm=id;renderList();}
+    else if(act==="nodelete"){openConfirm=null;renderList();}
+    else if(act==="delete"){openConfirm=null; try{await db.doc("proposte/"+id).delete();toast("Voce eliminata");}catch(e){toast("Eliminazione non riuscita.");}}
+    else if(act==="riproponi"){
+      const nid="r-"+id; if(docs.some(x=>x.id===nid)){toast("Questa voce è già nel piano 2026/27");return;}
+      const copy=Object.assign({},d); delete copy.id;
+      Object.assign(copy,{stato:"proposta",origine:"manuale",aggiuntoIl:new Date().toISOString().slice(0,10),scadenza:"",periodo:"",
+        note:(d.note?d.note+"\n":"")+"Riproposta dal piano 2025/26."});
+      try{await db.doc("proposte/"+nid).set(copy);toast("Copiata nel piano 2026/27");}catch(e){toast("Copia non riuscita.");}
+    }
+  });
+  document.addEventListener("toggle",ev=>{const d=ev.target; if(d.matches&&d.matches("details[data-det]")){d.open?openDetails.add(d.dataset.det):openDetails.delete(d.dataset.det);}},true);
+  ["q","farea","fprio","sort"].forEach(id=>$("#"+id).addEventListener("input",renderList));
+
+  $("#b-add").addEventListener("click",()=>{const p=$("#addpanel");p.hidden=!p.hidden;if(!p.hidden)$("#a-titolo").focus();});
+  $("#a-cancel").addEventListener("click",()=>{$("#addform").reset();$("#addpanel").hidden=true;});
+  $("#addform").addEventListener("submit",async ev=>{ev.preventDefault(); if(!db)return;
+    const v=id=>$(id).value.trim();
+    const rec={titolo:v("#a-titolo"),ente:v("#a-ente"),area:v("#a-area"),destinatari:v("#a-dest"),modalita:v("#a-mod"),periodo:v("#a-per"),ore:v("#a-ore"),
+      scadenza:v("#a-scad"),link:v("#a-link"),finanziamento:v("#a-fin"),note:v("#a-note"),stato:$("#a-stato").value,origine:"manuale",
+      priorita:[],fonte:"Inserimento manuale",aggiuntoIl:new Date().toISOString().slice(0,10),verificatoIl:"",pertinenza:"",piattaforma:""};
+    if(!rec.titolo)return;
+    try{await db.collection("proposte").add(rec); $("#addform").reset(); $("#addpanel").hidden=true; toast("Proposta salvata"); setTab(rec.stato==="proposta"?"piano":"valutare");}
+    catch(e){toast("Salvataggio non riuscito. Riprova tra poco.");}
+  });
+
+  $("#b-csv").addEventListener("click",async ()=>{
+    const items=filtered();
+    if(!items.length){toast("Nessuna voce da esportare in questa sezione.");return;}
+    const cols=[["titolo","Titolo"],["stato","Stato"],["area","Area"],["ente","Ente/formatore"],["destinatari","Destinatari"],["modalita","Modalità"],["periodo","Periodo"],["ore","Ore"],["scadenza","Scadenza iscrizione"],["finanziamento","Finanziamento"],["priorita","Priorità RAV"],["link","Link"],["fonte","Fonte"],["note","Note"],["noteCommissione","Note Commissione"]];
+    const cell=v=>{v=Array.isArray(v)?v.join(" "):String(v==null?"":v); return '"'+v.replace(/"/g,'""')+'"';};
+    const csv="﻿"+cols.map(c=>cell(c[1])).join(";")+"\r\n"+items.map(d=>cols.map(c=>cell(c[0]==="stato"?LABEL_STATO[d.stato]:d[c[0]])).join(";")).join("\r\n");
+    if(!dl){toast("L'esportazione non è disponibile in questa vista.");return;}
+    try{await dl.save({filename:`formazione-${tab}-${new Date().toISOString().slice(0,10)}.csv`,data:csv});}
+    catch(e){ if(e&&e.code!=="declined") toast("Esportazione non riuscita."); }
+  });
+
+  function renderAgent(m){
+    const el=$("#agent");
+    if(!m){el.innerHTML='<span class="dot"></span><span>L\'agente non ha ancora eseguito una ricerca.</span>';return;}
+    const last=m.ultimaEsecuzione||"";
+    const d=last?daysTo(last.slice(0,10)):null;
+    const cls=(d!==null&&d>=-3)?"ok":"warn";
+    el.innerHTML=`<span class="dot ${cls}"></span><span>Ultima ricerca dell'agente: <span class="mono">${esc(fmtDate(last.slice(0,10)))}</span>${m.nuove!=null?` · ${esc(m.nuove)} nuove`:""}${m.esito?` · ${esc(m.esito)}`:""}</span>`;
+    if(m.fonti&&m.fonti.length) el.title="Fonti controllate: "+m.fonti.join(", ");
+  }
+
+  docs=window.__DATI_PORTALE__.proposte; db={}; canWrite=false;
+  $("#readonly").hidden=false; $("#b-add").hidden=true; $("#b-csv").hidden=true;
+  renderAgent(window.__DATI_PORTALE__.meta);
+  render();
+})();
+</script>
+</body></html>
